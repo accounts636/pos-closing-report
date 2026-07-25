@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POS Closing Report — Sign In</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="login-shell">
+    <div class="login-card">
+      <img class="mark" id="loginLogo" alt="Tayn Roastery logo" style="border-radius:50%; object-fit:cover; background:#fff; box-shadow: 0 0 0 1.5px var(--gold); border: none;">
+      <h1>POS <em>Closing</em> Report</h1>
+      <p class="sub">Sign in to record or review a closing.</p>
+      <div class="error-box" id="errorBox"></div>
+      <form id="loginForm">
+        <div class="field">
+          <label for="username">Username</label>
+          <input type="text" id="username" autocomplete="username" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Sign In</button>
+      </form>
+    </div>
+  </div>
+
+<script src="/js/logo.js"></script>
+<script>
+document.getElementById('loginLogo').src = LOGO_DATA_URI;
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errorBox = document.getElementById('errorBox');
+  errorBox.style.display = 'none';
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Login failed');
+    window.location.href = '/dashboard.html';
+  } catch (err) {
+    errorBox.textContent = err.message;
+    errorBox.style.display = 'block';
+  }
+});
+
+fetch('/api/auth/me').then(r => r.json()).then(d => {
+  if (d.user) window.location.href = '/dashboard.html';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POS Closing Report — Dashboard</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><img class="mark logo-img" id="topbarLogo" alt="Tayn Roastery logo"> POS <em>Closing</em> Report</div>
+    <nav>
+      <a href="/dashboard.html" class="active">Closings</a>
+      <a href="/admin.html" id="adminLink" class="hidden">Admin</a>
+      <span class="who" id="whoami"></span>
+      <button id="logoutBtn">Sign out</button>
+    </nav>
+  </div>
+
+  <div class="wrap">
+
+    <div class="stat-cards" id="statCards"></div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="eyebrow">Outlet Information</div>
+          <h2>Shift <em>Details</em></h2>
+        </div>
+      </div>
+
+      <div class="error-box" id="formError"></div>
+      <div class="success-box" id="formSuccess"></div>
+
+      <form id="entryForm">
+        <div class="grid-3">
+          <div class="field">
+            <label for="company">Company</label>
+            <input type="text" id="company" value="Bettergrow Holding Company">
+          </div>
+          <div class="field">
+            <label for="outlet">Outlet</label>
+            <input type="text" id="outlet" placeholder="e.g. Karama Branch">
+          </div>
+          <div class="field">
+            <label for="entry_date">Date</label>
+            <input type="date" id="entry_date" required>
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="field">
+            <label for="shift">Shift</label>
+            <select id="shift">
+              <option>Morning</option>
+              <option>Afternoon</option>
+              <option>Evening</option>
+              <option>Night</option>
+              <option>Full Day</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="pos_counter">POS Counter</label>
+            <input type="text" id="pos_counter" placeholder="e.g. Till 2">
+          </div>
+          <div class="field">
+            <label for="cashier_name">Cashier</label>
+            <input type="text" id="cashier_name" placeholder="Cashier name">
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="field">
+            <label for="supervisor_name">Supervisor</label>
+            <input type="text" id="supervisor_name" placeholder="Supervisor name">
+          </div>
+        </div>
+
+        <div class="eyebrow" style="margin-top:10px;">Sales Summary</div>
+        <table class="pay-summary" id="paySummaryTable">
+          <thead>
+            <tr><th>Payment Method</th><th style="text-align:right;">POS (AED)</th><th style="text-align:right;">Actual (AED)</th><th style="text-align:right;">Difference</th></tr>
+          </thead>
+          <tbody id="paySummaryBody"></tbody>
+          <tfoot>
+            <tr>
+              <td>Total</td>
+              <td class="diff-cell" id="paySummaryPosTotal">0.00</td>
+              <td class="diff-cell" id="paySummaryActualTotal">0.00</td>
+              <td class="diff-cell" id="paySummaryDiffTotal">0.00</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <div class="eyebrow" style="margin-top:26px;">Cash Denomination</div>
+        <div class="denom-grid" id="denomGrid"></div>
+
+        <div class="totals-strip">
+          <span>Total Cash Counted (Actual Cash)</span>
+          <span class="figure mono" id="countedTotal">AED 0.00</span>
+        </div>
+
+        <div class="eyebrow" style="margin-top:26px;">Cash Reconciliation</div>
+        <div class="recon-grid">
+          <div class="recon-row">
+            <span class="recon-label">Opening Float</span>
+            <input type="number" step="0.01" min="0" id="opening_float" value="0">
+          </div>
+          <div class="recon-row">
+            <span class="recon-label">Cash Received</span>
+            <input type="number" step="0.01" min="0" id="cash_received" value="0">
+          </div>
+          <div class="recon-row">
+            <span class="recon-label">Less: Petty Cash</span>
+            <input type="number" step="0.01" min="0" id="petty_cash" value="0">
+          </div>
+          <div class="recon-row">
+            <span class="recon-label">Less: Cash Deposit</span>
+            <input type="number" step="0.01" min="0" id="cash_deposit" value="0">
+          </div>
+          <div class="recon-row readonly">
+            <span class="recon-label">POS Cash Sales</span>
+            <span class="recon-value" id="posCashSalesDisplay">AED 0.00</span>
+          </div>
+          <div class="recon-row readonly">
+            <span class="recon-label">Expected Cash</span>
+            <span class="recon-value" id="expectedCashDisplay">AED 0.00</span>
+          </div>
+        </div>
+
+        <div class="short-excess-banner" id="shortExcessBanner">
+          <span class="banner-label" id="shortExcessLabel">Short / (Excess)</span>
+          <span class="banner-value" id="shortExcessValue">AED 0.00</span>
+        </div>
+
+        <div class="eyebrow" style="margin-top:26px;">Notes</div>
+        <div class="field">
+          <textarea id="notes" rows="2" placeholder="Anything worth flagging about this closing"></textarea>
+        </div>
+
+        <div class="eyebrow" style="margin-top:10px;">Authorization</div>
+        <div class="auth-grid">
+          <div class="auth-card">
+            <div class="auth-role">Prepared By · Cashier</div>
+            <input type="text" id="prepared_by" placeholder="Name">
+          </div>
+          <div class="auth-card">
+            <div class="auth-role">Verified By · Supervisor</div>
+            <input type="text" id="verified_by" placeholder="Name">
+          </div>
+          <div class="auth-card">
+            <div class="auth-role">Received By · Finance</div>
+            <input type="text" id="received_by" placeholder="Name">
+          </div>
+        </div>
+
+        <div style="margin-top:22px;">
+          <button type="submit" class="btn btn-gold">Save Closing</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="eyebrow">History</div>
+          <h2>Closing <em>Records</em></h2>
+        </div>
+      </div>
+
+      <div class="filters" id="filters">
+        <div class="field">
+          <label>From</label>
+          <input type="date" id="filterFrom">
+        </div>
+        <div class="field">
+          <label>To</label>
+          <input type="date" id="filterTo">
+        </div>
+        <div class="field hidden" id="staffFilterWrap">
+          <label>Staff</label>
+          <select id="filterUser"><option value="">All staff</option></select>
+        </div>
+        <button class="btn btn-outline btn-sm" id="applyFilters" type="button">Apply</button>
+        <button class="btn btn-outline btn-sm" id="clearFilters" type="button">Clear</button>
+      </div>
+
+      <div id="ledgerWrap"></div>
+    </div>
+
+  </div>
+
+<script src="/js/logo.js"></script>
+<script src="/js/dashboard.js"></script>
+</body>
+</html>

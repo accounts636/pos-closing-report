@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POS Closing Report — Admin</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><img class="mark logo-img" id="topbarLogo" alt="Tayn Roastery logo"> POS <em>Closing</em> Report</div>
+    <nav>
+      <a href="/dashboard.html">Closings</a>
+      <a href="/admin.html" class="active">Admin</a>
+      <span class="who" id="whoami"></span>
+      <button id="logoutBtn">Sign out</button>
+    </nav>
+  </div>
+
+  <div class="wrap">
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="eyebrow">Admin</div>
+          <h2>Create <em>User</em></h2>
+        </div>
+      </div>
+      <div class="error-box" id="formError"></div>
+      <div class="success-box" id="formSuccess"></div>
+      <form id="userForm">
+        <div class="grid-2">
+          <div class="field">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" required>
+          </div>
+          <div class="field">
+            <label for="username">Username</label>
+            <input type="text" id="username" required>
+          </div>
+          <div class="field">
+            <label for="password">Temporary Password</label>
+            <input type="text" id="password" class="mono-input" required>
+          </div>
+          <div class="field">
+            <label for="role">Role</label>
+            <select id="role">
+              <option value="staff">Staff (own closings only)</option>
+              <option value="admin">Admin (sees everyone's closings)</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-gold">Create User</button>
+      </form>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="eyebrow">Team</div>
+          <h2><em>Users</em></h2>
+        </div>
+      </div>
+      <div id="usersWrap"></div>
+    </div>
+  </div>
+
+<script src="/js/logo.js"></script>
+<script src="/js/admin.js"></script>
+</body>
+</html>

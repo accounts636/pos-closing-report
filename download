@@ -1,0 +1,80 @@
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const { connect, toId } = require('../db');
+const { requireAdmin } = require('../middleware/auth');
+
+const router = express.Router();
+
+router.get('/', requireAdmin, async (req, res) => {
+  try {
+    const db = await connect();
+    const users = await db.collection('users')
+      .find({}, { projection: { password_hash: 0 } })
+      .sort({ created_at: -1 })
+      .toArray();
+    res.json({ users: users.map(u => ({ ...u, id: u._id.toString() })) });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error: ' + err.message });
+  }
+});
+
+router.post('/', requireAdmin, async (req, res) => {
+  try {
+    const { username, password, name, role } = req.body;
+    if (!username || !password || !name) {
+      return res.status(400).json({ error: 'Username, password, and name are required' });
+    }
+    if (password.length < 4) {
+      return res.status(400).json({ error: 'Password must be at least 4 characters' });
+    }
+    const db = await connect();
+    const existing = await db.collection('users').findOne({ username: username.trim() });
+    if (existing) return res.status(409).json({ error: 'Username already exists' });
+
+    const result = await db.collection('users').insertOne({
+      username: username.trim(),
+      password_hash: bcrypt.hashSync(password, 10),
+      name: name.trim(),
+      role: role === 'admin' ? 'admin' : 'staff',
+      created_at: new Date().toISOString()
+    });
+
+    res.status(201).json({ id: result.insertedId.toString() });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error: ' + err.message });
+  }
+});
+
+router.delete('/:id', requireAdmin, async (req, res) => {
+  try {
+    if (req.params.id === req.session.user.id) {
+      return res.status(400).json({ error: "You can't delete your own account while logged in" });
+    }
+    const db = await connect();
+    await db.collection('users').deleteOne({ _id: toId(req.params.id) });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error: ' + err.message });
+  }
+});
+
+router.post('/:id/reset-password', requireAdmin, async (req, res) => {
+  try {
+    const { newPassword } = req.body;
+    if (!newPassword || newPassword.length < 4) {
+      return res.status(400).json({ error: 'New password must be at least 4 characters' });
+    }
+    const db = await connect();
+    const hash = bcrypt.hashSync(newPassword, 10);
+    await db.collection('users').updateOne({ _id: toId(req.params.id) }, { $set: { password_hash: hash } });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error: ' + err.message });
+  }
+});
+
+module.exports = router;
